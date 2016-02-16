@@ -1,10 +1,11 @@
 #ifndef BOMBERMAN_HPP
 #define BOMBERMAN_HPP
 
+#include <SFML/Graphics.hpp>
+
 #include <array>
 #include <memory>
 
-#include "models/tile.hpp"
 #include "models/bomb.hpp"
 #include "utils/position.hpp"
 #include "utils/graphics.hpp"
@@ -13,6 +14,7 @@
 namespace model {
 
 class Bomb;
+class Map;
 
 class BomberMan : public std::enable_shared_from_this<BomberMan>,
                   public sf::Drawable
@@ -26,7 +28,7 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
 
   public:
 
-    BomberMan(const std::string& name, Position<float> position, std::shared_ptr<Map>& map);
+    BomberMan(const std::string& name, const std::string& logo, Position<float> position, std::shared_ptr<Map>& map);
     virtual ~BomberMan();
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -34,8 +36,20 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
 
     void setDirection(utils::graphics::Direction direction);
     void setMoving(bool is_moving) { _is_moving = is_moving; }
+    void setCanKickBombs(bool can_kick_bombs) { _can_kick_bombs = can_kick_bombs; }
+    void setCanThrowBombs(bool can_throw_bombs) { _can_throw_bombs = can_throw_bombs; }    
     std::shared_ptr<Bomb> dropBomb();
+
     void raiseAvailableBombs();
+    void raisePower();
+    void raiseSpeed();
+    void raiseNbrBombs();
+
+    const std::string& getName() const { return _name; }
+    const std::string& getLogoName() const { return _logo_name; }
+    unsigned short getAvailableBombs() const { return _available_bombs; }
+    unsigned short getBombsPower() const { return _bomb_power; }
+    bool isAlive() const { return _is_alive; }
 
   private:
 
@@ -49,8 +63,12 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
   private:
 
     float _movement_speed {0.17}; // pixels/ms
+    bool _is_alive {true};
     bool _is_moving {false};
+    bool _can_kick_bombs{false};
+    bool _can_throw_bombs{false};
     std::string _name;
+    std::string _logo_name;
     Position<float> _position;
     sf::Sprite _sprite;
     std::map<Texture, const sf::Texture&> _textures;

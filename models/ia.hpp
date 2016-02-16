@@ -9,7 +9,7 @@ class IA final : public BomberMan
 {
   public:
 
-    IA(const std::string& name, Position<float> position, std::shared_ptr<Map>& map);
+    IA(const std::string& name, const std::string& logo, Position<float> position, std::shared_ptr<Map>& map);
 };
 
 }

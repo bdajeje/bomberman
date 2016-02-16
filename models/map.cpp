@@ -5,6 +5,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "utils/file.hpp"
+#include "models/bonus.hpp"
 
 namespace model {
 
@@ -123,7 +124,7 @@ Position<size_t> Map::getTilePosition(const Position<float>& position) const
   return Position<size_t>{ position.x / _tile_size, position.y / _tile_size };
 }
 
-const Tile& Map::getTile(const Position<float>& position) const
+Tile& Map::getTile(const Position<float>& position)
 {
   Position<size_t> tile_position = getTilePosition(position);
   return _tiles[tile_position.y][tile_position.x];
@@ -145,31 +146,36 @@ void Map::bombExplose(const Position<float>& position, unsigned short power)
   const Position<size_t> center_tile_position = getTilePosition(position);
 
   // Find neighbour tiles which exploses too
+  std::string animation_name;
 
   // Horizontal tiles
   size_t x_min = std::max( static_cast<long unsigned int>(1), center_tile_position.x - power );
-  size_t x_max = std::min( width()-1, center_tile_position.x + power );
+  size_t x_max = std::min( width()-2, center_tile_position.x + power );
   for(size_t x = x_min; x <= x_max; ++x)
   {
     if( x == x_min )
-      _tiles[center_tile_position.y][x].exploses("horizontal_left_explosion");
+      animation_name = "horizontal_left_explosion";
     else if( x == x_max )
-      _tiles[center_tile_position.y][x].exploses("horizontal_right_explosion");
+      animation_name = "horizontal_right_explosion";
     else
-      _tiles[center_tile_position.y][x].exploses("horizontal_explosion");
+      animation_name = "horizontal_explosion";
+
+    _tiles[center_tile_position.y][x].exploses(animation_name);
   }
 
   // Vertical tiles
   size_t y_min = std::max( static_cast<long unsigned int>(1), center_tile_position.y - power );
-  size_t y_max = std::min( height()-1, center_tile_position.y + power );
+  size_t y_max = std::min( height()-3, center_tile_position.y + power );
   for(size_t y = y_min; y <= y_max; ++y)
   {
     if( y == y_min )
-      _tiles[y][center_tile_position.x].exploses("vertical_top_explosion");
+      animation_name = "vertical_top_explosion";
     else if( y == y_max )
-      _tiles[y][center_tile_position.x].exploses("vertical_bottom_explosion");
+      animation_name = "vertical_bottom_explosion";
     else
-      _tiles[y][center_tile_position.x].exploses("vertical_explosion");
+      animation_name = "vertical_explosion";
+
+    _tiles[y][center_tile_position.x].exploses(animation_name);
   }
 
   // Center tile

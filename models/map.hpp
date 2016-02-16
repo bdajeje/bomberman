@@ -11,6 +11,8 @@
 
 namespace model {
 
+class Tile;
+
 class Map final : public sf::Drawable
 {
   public:
@@ -26,7 +28,7 @@ class Map final : public sf::Drawable
     size_t height() const;
     Position<float> getPlayerStartingPosition(unsigned short player_nbr) const;
     unsigned short getTotalPlayers() const { return _player_starting_positions.size(); }
-    const Tile& getTile(const Position<float>& position) const;
+    Tile& getTile(const Position<float>& position);
     Position<float> getTileCenterPosition(const Position<float>& position);
     Position<size_t> getTilePosition(const Position<float>& position) const;
     bool isAllowedPosition(const Position<float>& position, unsigned short player_size) const;

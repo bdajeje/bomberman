@@ -6,8 +6,9 @@
 
 namespace model {
 
-BomberMan::BomberMan(const std::string& name, Position<float> position, std::shared_ptr<Map>& map)
+BomberMan::BomberMan(const std::string& name, const std::string& logo, Position<float> position, std::shared_ptr<Map>& map)
   : _name{name}
+  , _logo_name{logo}
   , _map{map}
 {
   _textures.emplace(Texture::Left, texture::TextureManager::get("player_left.png"));
@@ -73,7 +74,16 @@ void BomberMan::movementUpdate(const sf::Time& elapsed_time)
     Position<float> future_position = findFuturePosition(elapsed_time);
 
     if( _map->isAllowedPosition(future_position, _sprite_size) )
+    {
       updatePosition(future_position);
+      Tile& tile = _map->getTile(future_position);
+      const std::unique_ptr<Bonus>& bonus = tile.getBonus();
+      if( bonus )
+      {
+        bonus->playerPickUp(*this);
+        tile.removeBonus();
+      }
+    }
   }
 }
 
@@ -96,9 +106,25 @@ Position<float> BomberMan::findFuturePosition(const sf::Time& elapsed_time) cons
   return { _position.x + x_movement, _position.y + y_movement };
 }
 
+void BomberMan::raiseSpeed()
+{
+  _movement_speed += 0.05;
+}
+
+void BomberMan::raisePower()
+{
+  _bomb_power++;
+}
+
 void BomberMan::raiseAvailableBombs()
 {
   _available_bombs++;
+}
+
+void BomberMan::raiseNbrBombs()
+{
+  if( _available_bombs < 4 )
+    _available_bombs++;
 }
 
 std::shared_ptr<Bomb> BomberMan::dropBomb()

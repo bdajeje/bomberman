@@ -1,27 +1,44 @@
 #include <iostream>
+#include <stdlib.h>
 
 #include <SFML/Graphics.hpp>
 
+#include "defines.hpp"
 #include "utils/timer.hpp"
 #include "utils/graphics.hpp"
 #include "managers/texturemanager.hpp"
+#include "managers/fontmanager.hpp"
 #include "models/map.hpp"
 #include "models/player.hpp"
 #include "models/ia.hpp"
 #include "models/bomb.hpp"
+#include "graphics/hud.hpp"
 
 int main()
 {
-  sf::RenderWindow window(sf::VideoMode(800, 800), "Bomber Man");
+  sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Bomber Man");
   window.setFramerateLimit(60);
 
   texture::TextureManager::init("resources/textures/");
+  font::FontManager::init("resources/fonts/");
+
+  std::vector<std::shared_ptr<model::BomberMan>> players;
   std::shared_ptr<model::Map> map = std::make_shared<model::Map>("1");
-  std::shared_ptr<model::Player> player = std::make_shared<model::Player>("1", map->getPlayerStartingPosition(1), map);
+  std::shared_ptr<model::Player> player = std::make_shared<model::Player>("1", "player_logo", map->getPlayerStartingPosition(1), map);
+  players.push_back(player);
   std::vector<std::shared_ptr<model::Bomb>> bombs;
   std::vector<std::shared_ptr<model::IA>> ias;
   for(unsigned short i = 1; i < map->getTotalPlayers(); ++i)
-    ias.push_back( std::make_shared<model::IA>("IA " + std::to_string(i), map->getPlayerStartingPosition(i+1), map) );
+  {
+    std::shared_ptr<model::IA> ia = std::make_shared<model::IA>("IA " + std::to_string(i), "player_logo", map->getPlayerStartingPosition(i+1), map);
+    ias.push_back( ia );
+    players.push_back( ia );
+  }
+
+  sf::Time game_remaining_time = sf::seconds(120);
+  graphics::HUD hud {players, game_remaining_time};
+
+  srand(time(NULL));
 
   sf::Time last_update {sf::Time::Zero};
   utils::time::Timer timer;
@@ -34,6 +51,9 @@ int main()
     {
       player->setMoving(false);
 
+      // Remove compiler warnings about enumeration value not handled in switch
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wswitch"
       switch(event.type)
       {
         case sf::Event::Closed:
@@ -71,17 +91,18 @@ int main()
           }
         }
       }
+      #pragma GCC diagnostic pop
     }
 
     // Get elapsed time since last update
     const sf::Time elapsed_time = timer.getElapsedTime() - last_update;
+    game_remaining_time -= elapsed_time;
 
     // Update elements
+    hud.update(game_remaining_time);
     map->update(elapsed_time);
-    player->update(elapsed_time);
-
-    for(std::shared_ptr<model::IA>& ia : ias)
-      ia->update(elapsed_time);
+    for(std::shared_ptr<model::BomberMan>& player : players)
+      player->update(elapsed_time);
 
     for(size_t i = 0; i < bombs.size(); ++i)
     {
@@ -101,10 +122,10 @@ int main()
     window.clear();
     window.draw(*map.get());
     for(const std::shared_ptr<model::Bomb>& bomb : bombs)
-      window.draw(*bomb.get());
-    window.draw(*player.get());
-    for(const std::shared_ptr<model::IA>& ia : ias)
-      window.draw(*ia.get());
+      window.draw(*bomb.get());    
+    for(const std::shared_ptr<model::BomberMan>& player : players)
+      window.draw(*player);
+    window.draw(hud);
     window.display();
   }
 

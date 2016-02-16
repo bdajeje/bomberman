@@ -1,0 +1,8 @@
+#ifndef DEFINES_HPP
+#define DEFINES_HPP
+
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
+
+#endif // DEFINES_HPP
+

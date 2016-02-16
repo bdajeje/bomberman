@@ -12,7 +12,7 @@ class Player final : public BomberMan
 {
   public:
 
-    Player(const std::string& name, Position<float> position, std::shared_ptr<Map>& map);
+    Player(const std::string& name, const std::string& logo, Position<float> position, std::shared_ptr<Map>& map);
 };
 
 }

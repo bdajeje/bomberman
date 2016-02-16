@@ -15,7 +15,15 @@ SOURCES += main.cpp \
     models/bomberman.cpp \
     utils/graphics.cpp \
     models/bomb.cpp \
-    graphics/animation.cpp
+    graphics/animation.cpp \
+    managers/fontmanager.cpp \
+    models/bonus.cpp \
+    models/bonuspower.cpp \
+    models/bonuskick.cpp \
+    models/bonusspeed.cpp \
+    models/bonusthrow.cpp \
+    models/bonusbomb.cpp \
+    graphics/hud.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -35,4 +43,14 @@ HEADERS += \
     models/ia.hpp \
     models/bomberman.hpp \
     models/bomb.hpp \
-    graphics/animation.hpp
+    graphics/animation.hpp \
+    managers/fontmanager.hpp \
+    models/bonus.hpp \
+    models/bonuspower.hpp \
+    models/bonuskick.hpp \
+    models/bonusspeed.hpp \
+    models/bonusthrow.hpp \
+    models/bonusbomb.hpp \
+    models/bonus_types.hpp \
+    graphics/hud.hpp \
+    defines.hpp
