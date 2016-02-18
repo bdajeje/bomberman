@@ -49,6 +49,7 @@ class HUD final : public sf::Drawable
     std::vector<std::shared_ptr<model::BomberMan>> _players;
     std::vector<HUDPlayer> _player_informations;
     sf::Text _remaining_time;
+    sf::View _view;
 };
 
 }

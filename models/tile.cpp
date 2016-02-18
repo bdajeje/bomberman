@@ -55,7 +55,7 @@ void Tile::exploses(const std::__cxx11::string& animation)
   _explosion_animation.reset( new graphics::Animation(animation, _position, Map::_tile_size, Map::_tile_size, 16, 16) );
 
   // Start explosion animation
-  _explosion_animation->start(70, false);  
+  _explosion_animation->start(70, false);
 }
 
 void Tile::createBonus()

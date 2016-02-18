@@ -146,36 +146,65 @@ void Map::bombExplose(const Position<float>& position, unsigned short power)
   const Position<size_t> center_tile_position = getTilePosition(position);
 
   // Find neighbour tiles which exploses too
-  std::string animation_name;
 
-  // Horizontal tiles
-  size_t x_min = std::max( static_cast<long unsigned int>(1), center_tile_position.x - power );
-  size_t x_max = std::min( width()-2, center_tile_position.x + power );
-  for(size_t x = x_min; x <= x_max; ++x)
+  // To left
+  const size_t x_min = std::max( static_cast<long unsigned int>(1), center_tile_position.x - power );
+  for(size_t x = center_tile_position.x - 1; x >= x_min; --x)
   {
-    if( x == x_min )
-      animation_name = "horizontal_left_explosion";
-    else if( x == x_max )
-      animation_name = "horizontal_right_explosion";
-    else
-      animation_name = "horizontal_explosion";
+    Tile& tile = _tiles[center_tile_position.y][x];
 
-    _tiles[center_tile_position.y][x].exploses(animation_name);
+    if( tile.isBlocking() || x == x_min )
+    {
+      tile.exploses("horizontal_left_explosion");
+      break;
+    }
+    else
+      tile.exploses("horizontal_explosion");
   }
 
-  // Vertical tiles
-  size_t y_min = std::max( static_cast<long unsigned int>(1), center_tile_position.y - power );
-  size_t y_max = std::min( height()-3, center_tile_position.y + power );
-  for(size_t y = y_min; y <= y_max; ++y)
+  // To right
+  const size_t x_max = std::min( width()-2, center_tile_position.x + power );
+  for(size_t x = center_tile_position.x + 1; x <= x_max; ++x)
   {
-    if( y == y_min )
-      animation_name = "vertical_top_explosion";
-    else if( y == y_max )
-      animation_name = "vertical_bottom_explosion";
-    else
-      animation_name = "vertical_explosion";
+    Tile& tile = _tiles[center_tile_position.y][x];
 
-    _tiles[y][center_tile_position.x].exploses(animation_name);
+    if( tile.isBlocking() || x == x_max )
+    {
+      tile.exploses("horizontal_right_explosion");
+      break;
+    }
+    else
+      tile.exploses("horizontal_explosion");
+  }
+
+  // To top
+  size_t y_min = std::max( static_cast<long unsigned int>(1), center_tile_position.y - power );
+  for(size_t y = center_tile_position.y - 1; y >= y_min; --y)
+  {
+    Tile& tile = _tiles[y][center_tile_position.x];
+
+    if( tile.isBlocking() || y == y_min )
+    {
+      tile.exploses("vertical_top_explosion");
+      break;
+    }
+    else
+      tile.exploses("vertical_explosion");
+  }
+
+  // To bottom
+  size_t y_max = std::min( height()-3, center_tile_position.y + power );
+  for(size_t y = center_tile_position.y + 1; y <= y_max; ++y)
+  {
+    Tile& tile = _tiles[y][center_tile_position.x];
+
+    if( tile.isBlocking() || y == y_max )
+    {
+      tile.exploses("vertical_bottom_explosion");
+      break;
+    }
+    else
+      tile.exploses("vertical_explosion");
   }
 
   // Center tile

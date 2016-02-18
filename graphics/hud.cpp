@@ -26,7 +26,7 @@ HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<f
   {
     text->setFont(font);
     text->setCharacterSize(15);
-    text->setColor(sf::Color::Black);
+    text->setColor(sf::Color::White);
   }
 
   // Name
@@ -39,14 +39,20 @@ HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<f
   // Bomb number skill
   _bombs.setTexture( texture::TextureManager::get("bonus_bomb.png") );
   _bombs.setPosition(position.x, position.y);
-  utils::graphics::resize(_bombs, 15, 15);
+  utils::graphics::resize(_bombs, 15, 15);  
 
-  position.x += 25;
+  position.x += 20;
+  _bombs_number.setPosition(position.x, position.y);
+
+  position.x += 15;
 
   // Bomb power skill
   _power.setTexture( texture::TextureManager::get("bonus_power.png") );
   _power.setPosition(position.x, position.y);
   utils::graphics::resize(_power, 15, 15);
+
+  position.x += 20;
+  _power_number.setPosition(position.x, position.y);
 }
 
 void HUDPlayer::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -68,10 +74,10 @@ HUD::HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const sf
 {
   _remaining_time.setFont(font::FontManager::get("consolas.ttf"));
   _remaining_time.setCharacterSize(15);
-  _remaining_time.setColor(sf::Color::Black);
+  _remaining_time.setColor(sf::Color::White);
   setRemainingTime(remaining_time);
 
-  Position<float> position {0, 10};
+  Position<float> position {50, 5};
   _player_informations.reserve(players.size());
   for( size_t i = 0; i < players.size(); ++i )
   {
@@ -82,6 +88,7 @@ HUD::HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const sf
 
 void HUD::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+  // Draw on HUD view
   target.draw(_remaining_time, states);
   for( size_t i = 0; i < _player_informations.size(); ++i )
     target.draw( _player_informations[i], states );

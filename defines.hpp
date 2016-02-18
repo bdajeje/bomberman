@@ -1,8 +1,9 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
+#define HUD_HEIGHT 50
 #define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
+#define WINDOW_HEIGHT 850
 
 #endif // DEFINES_HPP
 

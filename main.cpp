@@ -44,6 +44,10 @@ int main()
   utils::time::Timer timer;
   timer.start();
 
+  sf::View game_view{ {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT} };
+  game_view.move(0, -HUD_HEIGHT);
+  sf::View hud_view{ {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT} };
+
   while(window.isOpen())
   {
     sf::Event event;
@@ -120,11 +124,13 @@ int main()
 
     // Draw everything
     window.clear();
+    window.setView(game_view);
     window.draw(*map.get());
     for(const std::shared_ptr<model::Bomb>& bomb : bombs)
       window.draw(*bomb.get());    
     for(const std::shared_ptr<model::BomberMan>& player : players)
       window.draw(*player);
+    window.setView(hud_view);
     window.draw(hud);
     window.display();
   }

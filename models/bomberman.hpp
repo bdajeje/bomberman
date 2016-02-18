@@ -75,7 +75,7 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
     utils::graphics::Direction _direction{utils::graphics::Direction::Bottom};
     std::shared_ptr<Map> _map;
     unsigned short _available_bombs {1};
-    unsigned short _bomb_power {1};
+    unsigned short _bomb_power {5};
 };
 
 }
