@@ -11,6 +11,8 @@
 
 namespace graphics {
 
+const std::string HUD::s_end_time_str = "finishing!";
+
 HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<float> position)
 {
   // Logo
@@ -88,16 +90,35 @@ HUD::HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const sf
 
 void HUD::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-  // Draw on HUD view
-  target.draw(_remaining_time, states);
+  if(_draw_remaining_time)
+    target.draw( _remaining_time, states );
+
   for( size_t i = 0; i < _player_informations.size(); ++i )
     target.draw( _player_informations[i], states );
 }
 
-void HUD::update(const sf::Time& remaining_time)
+void HUD::update(const sf::Time& elapsed_time, const sf::Time& remaining_time)
 {
   // Update remaining time
-  setRemainingTime(remaining_time);
+  if( remaining_time.asSeconds() > 0 )
+    setRemainingTime(remaining_time);
+  else
+  {
+    // Update text
+    if(_remaining_time.getString() != s_end_time_str)
+    {
+      _remaining_time.setString(s_end_time_str);
+      _remaining_time.setPosition( (WINDOW_WIDTH - _remaining_time.getGlobalBounds().width) / 2, _remaining_time.getPosition().y );
+    }
+
+    // Make remaining time blink
+    _blinking_remaining_time += elapsed_time.asMilliseconds();
+    if( _blinking_remaining_time >= _blinking_time )
+    {
+      _blinking_remaining_time = _blinking_remaining_time - _blinking_time;
+      _draw_remaining_time = !_draw_remaining_time;
+    }
+  }
 
   // Update user info
   for( size_t i = 0; i < _players.size(); ++i )
@@ -115,11 +136,10 @@ void HUD::update(const sf::Time& remaining_time)
 void HUD::setRemainingTime(const sf::Time& remaining_time)
 {
   int remaining_seconds = static_cast<int>(remaining_time.asSeconds());
-  int remaining_mins    = remaining_seconds / 60;
+  int remaining_mins = remaining_seconds / 60;
   remaining_seconds -= remaining_mins * 60;
-  const std::string remaining_time_str = std::to_string(remaining_mins) + ":" + std::to_string(remaining_seconds);
 
-  _remaining_time.setString( remaining_time_str );
+  _remaining_time.setString( std::to_string(remaining_mins) + ":" + std::to_string(remaining_seconds) );
   _remaining_time.setPosition( (WINDOW_WIDTH - _remaining_time.getGlobalBounds().width) / 2, 20 );
 }
 

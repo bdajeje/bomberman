@@ -35,10 +35,10 @@ class HUD final : public sf::Drawable
 {
   public:
 
-    HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const sf::Time& remaining_time);
+    HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const sf::Time& remaining_time);    
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    void update(const sf::Time& remaining_time);
+    void update(const sf::Time& elapsed_time, const sf::Time& remaining_time);
 
   private:
 
@@ -48,8 +48,13 @@ class HUD final : public sf::Drawable
 
     std::vector<std::shared_ptr<model::BomberMan>> _players;
     std::vector<HUDPlayer> _player_informations;
-    sf::Text _remaining_time;
     sf::View _view;
+
+    static const std::string s_end_time_str;
+    static constexpr unsigned int _blinking_time {350}; // in ms
+    unsigned int _blinking_remaining_time {0}; // in ms
+    bool _draw_remaining_time {true};
+    sf::Text _remaining_time;
 };
 
 }

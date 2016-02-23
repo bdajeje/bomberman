@@ -22,11 +22,6 @@ BomberMan::BomberMan(const std::string& name, const std::string& logo, Position<
   updatePosition(position);
 }
 
-BomberMan::~BomberMan()
-{
-
-}
-
 void BomberMan::setCurrentTexture(Texture texture)
 {
    _sprite.setTexture( _textures.at(texture) );

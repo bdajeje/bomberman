@@ -29,7 +29,7 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
   public:
 
     BomberMan(const std::string& name, const std::string& logo, Position<float> position, std::shared_ptr<Map>& map);
-    virtual ~BomberMan();
+    virtual ~BomberMan() = default;
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void update(const sf::Time& elapsed_time);
@@ -75,7 +75,7 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
     utils::graphics::Direction _direction{utils::graphics::Direction::Bottom};
     std::shared_ptr<Map> _map;
     unsigned short _available_bombs {1};
-    unsigned short _bomb_power {5};
+    unsigned short _bomb_power {1};
 };
 
 }

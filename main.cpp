@@ -2,12 +2,14 @@
 #include <stdlib.h>
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio/Sound.hpp>
 
 #include "defines.hpp"
 #include "utils/timer.hpp"
 #include "utils/graphics.hpp"
 #include "managers/texturemanager.hpp"
 #include "managers/fontmanager.hpp"
+#include "managers/soundmanager.hpp"
 #include "models/map.hpp"
 #include "models/player.hpp"
 #include "models/ia.hpp"
@@ -21,6 +23,7 @@ int main()
 
   texture::TextureManager::init("resources/textures/");
   font::FontManager::init("resources/fonts/");
+  sound::SoundManager::init("resources/sounds/");
 
   std::vector<std::shared_ptr<model::BomberMan>> players;
   std::shared_ptr<model::Map> map = std::make_shared<model::Map>("1");
@@ -35,18 +38,22 @@ int main()
     players.push_back( ia );
   }
 
-  sf::Time game_remaining_time = sf::seconds(120);
+  sf::Time game_remaining_time = sf::seconds(1); // sf::seconds(120);
   graphics::HUD hud {players, game_remaining_time};
 
   srand(time(NULL));
 
-  sf::Time last_update {sf::Time::Zero};
-  utils::time::Timer timer;
-  timer.start();
-
   sf::View game_view{ {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT} };
   game_view.move(0, -HUD_HEIGHT);
   sf::View hud_view{ {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT} };
+
+  sf::Time last_update {sf::Time::Zero};
+  utils::time::Timer timer;
+
+  // Start game
+  sf::Sound sound {sound::SoundManager::get("game_start.wav")};
+  sound.play();
+  timer.start();  
 
   while(window.isOpen())
   {
@@ -103,7 +110,7 @@ int main()
     game_remaining_time -= elapsed_time;
 
     // Update elements
-    hud.update(game_remaining_time);
+    hud.update(elapsed_time, game_remaining_time);
     map->update(elapsed_time);
     for(std::shared_ptr<model::BomberMan>& player : players)
       player->update(elapsed_time);

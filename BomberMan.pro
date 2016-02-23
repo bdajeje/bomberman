@@ -23,7 +23,11 @@ SOURCES += main.cpp \
     models/bonusspeed.cpp \
     models/bonusthrow.cpp \
     models/bonusbomb.cpp \
-    graphics/hud.cpp
+    graphics/hud.cpp \
+    managers/soundmanager.cpp \
+    graphics/effects/effect_core.cpp \
+    graphics/effects/blink_effect.cpp \
+    graphics/drawable.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -53,4 +57,10 @@ HEADERS += \
     models/bonusbomb.hpp \
     models/bonus_types.hpp \
     graphics/hud.hpp \
-    defines.hpp
+    defines.hpp \
+    managers/soundmanager.hpp \
+    graphics/effects/effect_interface.hpp \
+    graphics/effects/effect_core.hpp \
+    graphics/effects/effect.hpp \
+    graphics/effects/blink_effect.hpp \
+    graphics/drawable.hpp
