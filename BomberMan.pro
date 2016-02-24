@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     managers/soundmanager.cpp \
     graphics/effects/effect_core.cpp \
     graphics/effects/blink_effect.cpp \
-    graphics/drawable.cpp
+    graphics/drawable.cpp \
+    utils/time_trigger.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -63,4 +64,5 @@ HEADERS += \
     graphics/effects/effect_core.hpp \
     graphics/effects/effect.hpp \
     graphics/effects/blink_effect.hpp \
-    graphics/drawable.hpp
+    graphics/drawable.hpp \
+    utils/time_trigger.hpp

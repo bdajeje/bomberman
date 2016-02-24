@@ -9,8 +9,9 @@
 
 namespace model {
 
-Map::Map(const std::string& name)
+Map::Map(const std::string& name, const std::shared_ptr<sf::Time>& game_remaining_time)
   : _name {name}
+  , _game_remaining_time {game_remaining_time}
 {
   // Load map
   loadMap("resources/maps/" + _name);
@@ -40,11 +41,11 @@ void Map::loadMap(const std::string filepath)
       Position<float> position{x * _tile_size, y * _tile_size};
 
       if(character == '#')
-        _tiles[y].emplace_back( Tile{"block", 1, position});
+        _tiles[y].emplace_back( Tile{"block", true, true, position});
       else if(character == '$')
-        _tiles[y].emplace_back( Tile{"block_border", 1, position});
+        _tiles[y].emplace_back( Tile{"block_border", true, false, position});
       else
-        _tiles[y].emplace_back( Tile{"path", 0, position} );
+        _tiles[y].emplace_back( Tile{"path", false, true, position} );
 
       // Read player position information if here
       try
@@ -76,6 +77,30 @@ void Map::update(const sf::Time& elapsed_time)
     for( Tile& tile : line )
       tile.update(elapsed_time);
   }
+
+  if( _game_remaining_time->asSeconds() < 0 )
+    createBlockOfDeath(elapsed_time);
+}
+
+void Map::createBlockOfDeath(const sf::Time& elapsed_time)
+{
+  if(!_block_of_death_trigger)
+    _block_of_death_trigger.reset( new utils::TimeTrigger(1000) );
+
+  _block_of_death_trigger->update(elapsed_time);
+  if(!_block_of_death_trigger->toggle())
+    return;
+
+  // Find where to create block of death
+  std::vector<Position<size_t>> free_positions = findFreeTilePositionsOnBorders();
+
+  if( free_positions.empty() )
+    return;
+
+  // Mark random spot as block of death incoming
+  int random_index = rand() % (free_positions.size() - 1);
+  Tile& tile = getTile( free_positions[random_index].x, free_positions[random_index].y );
+  tile.blockOfDeathIncoming();
 }
 
 Position<float> Map::getPlayerStartingPosition(unsigned short player_nbr) const
@@ -130,6 +155,11 @@ Tile& Map::getTile(const Position<float>& position)
   return _tiles[tile_position.y][tile_position.x];
 }
 
+Tile& Map::getTile(size_t x, size_t y)
+{
+  return _tiles[y][x];
+}
+
 size_t Map::width() const
 {
   return _tiles[0].size();
@@ -153,7 +183,9 @@ void Map::bombExplose(const Position<float>& position, unsigned short power)
   {
     Tile& tile = _tiles[center_tile_position.y][x];
 
-    if( tile.isBlocking() || x == x_min )
+    if( !tile.isBreakable() )
+      break;
+    else if( tile.isBlocking() || x == x_min )
     {
       tile.exploses("horizontal_left_explosion");
       break;
@@ -168,7 +200,9 @@ void Map::bombExplose(const Position<float>& position, unsigned short power)
   {
     Tile& tile = _tiles[center_tile_position.y][x];
 
-    if( tile.isBlocking() || x == x_max )
+    if( !tile.isBreakable() )
+      break;
+    else if( tile.isBlocking() || x == x_max )
     {
       tile.exploses("horizontal_right_explosion");
       break;
@@ -183,7 +217,9 @@ void Map::bombExplose(const Position<float>& position, unsigned short power)
   {
     Tile& tile = _tiles[y][center_tile_position.x];
 
-    if( tile.isBlocking() || y == y_min )
+    if( !tile.isBreakable() )
+      break;
+    else if( tile.isBlocking() || y == y_min )
     {
       tile.exploses("vertical_top_explosion");
       break;
@@ -198,7 +234,9 @@ void Map::bombExplose(const Position<float>& position, unsigned short power)
   {
     Tile& tile = _tiles[y][center_tile_position.x];
 
-    if( tile.isBlocking() || y == y_max )
+    if( !tile.isBreakable() )
+      break;
+    else if( tile.isBlocking() || y == y_max )
     {
       tile.exploses("vertical_bottom_explosion");
       break;
@@ -218,6 +256,41 @@ Position<float> Map::getTileCenterPosition(const Position<float>& position)
   tile_position.x += _tile_size / 2;
   tile_position.y += _tile_size / 2;
   return tile_position;
+}
+
+std::vector<Position<size_t>> Map::findFreeTilePositionsOnBorders(size_t depth) const
+{
+  if( depth >= width() / 2 )
+    return {};
+
+  std::vector<Position<size_t>> results;
+
+  size_t min_x = depth;
+  size_t min_y = depth;
+  size_t max_x = width() - 1 - depth;
+  size_t max_y = height() - 1 - depth;
+
+  // Top and bottom lines
+  for( size_t x = min_x; x <= max_x; ++x )
+  {
+    if( !_tiles[min_y][x].isBlocking() && !_tiles[min_y][x].isBlockOfDeathIncoming() ) results.emplace_back( x, min_y );
+    if( !_tiles[max_y][x].isBlocking() && !_tiles[max_y][x].isBlockOfDeathIncoming() ) results.emplace_back( x, max_y );
+  }
+
+  // Left and right lines
+  min_y++;
+  max_y--;
+  for( size_t y = min_y; y <= max_y; ++y )
+  {
+    const std::vector<Tile>& line = _tiles[y];
+    if( !line[min_x].isBlocking() && !line[min_x].isBlockOfDeathIncoming() ) results.emplace_back( min_x, y );
+    if( !line[max_x].isBlocking() && !line[max_x].isBlockOfDeathIncoming() ) results.emplace_back( max_x, y );
+  }
+
+  if(results.empty())
+    return findFreeTilePositionsOnBorders(++depth);
+
+  return std::move(results);
 }
 
 }

@@ -25,8 +25,9 @@ int main()
   font::FontManager::init("resources/fonts/");
   sound::SoundManager::init("resources/sounds/");
 
+  std::shared_ptr<sf::Time> game_remaining_time = std::make_shared<sf::Time>(sf::seconds(1)); // sf::seconds(120);
   std::vector<std::shared_ptr<model::BomberMan>> players;
-  std::shared_ptr<model::Map> map = std::make_shared<model::Map>("1");
+  std::shared_ptr<model::Map> map = std::make_shared<model::Map>("1", game_remaining_time);
   std::shared_ptr<model::Player> player = std::make_shared<model::Player>("1", "player_logo", map->getPlayerStartingPosition(1), map);
   players.push_back(player);
   std::vector<std::shared_ptr<model::Bomb>> bombs;
@@ -38,7 +39,6 @@ int main()
     players.push_back( ia );
   }
 
-  sf::Time game_remaining_time = sf::seconds(1); // sf::seconds(120);
   graphics::HUD hud {players, game_remaining_time};
 
   srand(time(NULL));
@@ -107,10 +107,10 @@ int main()
 
     // Get elapsed time since last update
     const sf::Time elapsed_time = timer.getElapsedTime() - last_update;
-    game_remaining_time -= elapsed_time;
+    *game_remaining_time -= elapsed_time;
 
     // Update elements
-    hud.update(elapsed_time, game_remaining_time);
+    hud.update(elapsed_time);
     map->update(elapsed_time);
     for(std::shared_ptr<model::BomberMan>& player : players)
       player->update(elapsed_time);

@@ -19,14 +19,24 @@ class Tile final
 {
   public:
 
-    Tile(const std::string& texture_name, bool blockable, const Position<float>& position);
+    Tile(const std::string& texture_name, bool blockable, bool breakable, const Position<float>& position);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void update(const sf::Time& elapsed_time);
 
-    bool isBlocking() const { return _blockable; }
     void exploses(const std::string& animation);
+
+    /*! Update the tile to mark it with an incoming block of death
+     *  Block of death animation starts, soon a new unbrakable block
+     *  will land on this tile and the tile will become blockable.
+     */
+    void blockOfDeathIncoming();
+
+    bool isBlocking() const { return _blockable; }
+    bool isBreakable() const { return _breakable; }
+    bool isBlockOfDeathIncoming() const;
     const Position<float>& getPosition() const { return _position; }
+
     bool hasBonus() const { return _bonus.get() != nullptr; }
     void removeBonus() { _bonus.release(); }
     const std::unique_ptr<Bonus>& getBonus() const { return _bonus; }
@@ -41,10 +51,17 @@ class Tile final
   private:
 
     bool _blockable;
+    bool _breakable;
     Position<float> _position;
     sf::Sprite _sprite;
     std::unique_ptr<graphics::Animation> _explosion_animation;
     std::unique_ptr<Bonus> _bonus;
+
+    /*! Animation of the growing shadow of an incoming block of death */
+    std::unique_ptr<graphics::Animation> _incoming_block_of_death_shadow_animation;
+
+    /*! Animation of the block of death incoming onto the tile */
+    std::unique_ptr<graphics::Animation> _incoming_block_of_death_animation;
 };
 
 }

@@ -11,8 +11,6 @@
 
 namespace graphics {
 
-const std::string HUD::s_end_time_str = "finishing!";
-
 HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<float> position)
 {
   // Logo
@@ -71,13 +69,14 @@ void HUDPlayer::draw(sf::RenderTarget &target, sf::RenderStates states) const
     target.draw(*_kick_bomb, states);
 }
 
-HUD::HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const sf::Time& remaining_time)
+HUD::HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const std::shared_ptr<sf::Time>& game_remaining_time)
   : _players {players}
+  , _game_remaining_time {game_remaining_time}
 {
   _remaining_time.setFont(font::FontManager::get("consolas.ttf"));
   _remaining_time.setCharacterSize(15);
   _remaining_time.setColor(sf::Color::White);
-  setRemainingTime(remaining_time);
+  updateRemainingTime();
 
   Position<float> position {50, 5};
   _player_informations.reserve(players.size());
@@ -97,27 +96,25 @@ void HUD::draw(sf::RenderTarget& target, sf::RenderStates states) const
     target.draw( _player_informations[i], states );
 }
 
-void HUD::update(const sf::Time& elapsed_time, const sf::Time& remaining_time)
+void HUD::update(const sf::Time& elapsed_time)
 {
   // Update remaining time
-  if( remaining_time.asSeconds() > 0 )
-    setRemainingTime(remaining_time);
+  if( _game_remaining_time->asSeconds() > 0 )
+    updateRemainingTime();
   else
   {
     // Update text
-    if(_remaining_time.getString() != s_end_time_str)
+    if(!_end_blinking_trigger)
     {
-      _remaining_time.setString(s_end_time_str);
+      _remaining_time.setString("finishing!");
       _remaining_time.setPosition( (WINDOW_WIDTH - _remaining_time.getGlobalBounds().width) / 2, _remaining_time.getPosition().y );
+      _end_blinking_trigger.reset( new utils::TimeTrigger(350) );
     }
 
     // Make remaining time blink
-    _blinking_remaining_time += elapsed_time.asMilliseconds();
-    if( _blinking_remaining_time >= _blinking_time )
-    {
-      _blinking_remaining_time = _blinking_remaining_time - _blinking_time;
+    _end_blinking_trigger->update(elapsed_time);
+    if( _end_blinking_trigger->toggle() )
       _draw_remaining_time = !_draw_remaining_time;
-    }
   }
 
   // Update user info
@@ -133,9 +130,9 @@ void HUD::update(const sf::Time& elapsed_time, const sf::Time& remaining_time)
   }
 }
 
-void HUD::setRemainingTime(const sf::Time& remaining_time)
+void HUD::updateRemainingTime()
 {
-  int remaining_seconds = static_cast<int>(remaining_time.asSeconds());
+  int remaining_seconds = static_cast<int>(_game_remaining_time->asSeconds());
   int remaining_mins = remaining_seconds / 60;
   remaining_seconds -= remaining_mins * 60;
 

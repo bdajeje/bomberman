@@ -13,8 +13,9 @@
 
 namespace model {
 
-Tile::Tile(const std::string& texture_name, bool blockable, const Position<float>& position)
+Tile::Tile(const std::string& texture_name, bool blockable, bool breakable, const Position<float>& position)
   : _blockable{blockable}
+  , _breakable{breakable}
   , _position{position}
 {
   _sprite.setPosition(position.x, position.y);
@@ -30,6 +31,9 @@ void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
   if(_explosion_animation)
     target.draw(*_explosion_animation, states);
+
+  if(_incoming_block_of_death_shadow_animation)
+    target.draw(*_incoming_block_of_death_shadow_animation, states);
 }
 
 void Tile::update(const sf::Time& elapsed_time)
@@ -40,9 +44,26 @@ void Tile::update(const sf::Time& elapsed_time)
     if(_explosion_animation->finished())
       _explosion_animation.release();
   }
+
+  // Block of death animations
+  if(_incoming_block_of_death_shadow_animation)
+  {
+    _incoming_block_of_death_shadow_animation->update(elapsed_time);
+
+    if(_incoming_block_of_death_shadow_animation->finished())
+    {
+      _incoming_block_of_death_shadow_animation.release();
+
+      // \todo then start incoming block animation, but I guess this should be an effect runned an a sprite to make the move from air to ground
+      // for now simply put a unbreackable block instead
+      _blockable = true;
+      _breakable = false;
+      _sprite.setTexture( texture::TextureManager::get("block_border.png") );
+    }
+  }
 }
 
-void Tile::exploses(const std::__cxx11::string& animation)
+void Tile::exploses(const std::string& animation)
 {
   // Tile was blockable? Well no more now
   if(_blockable)
@@ -87,6 +108,18 @@ void Tile::createBonus()
     case bonus::Type::Throw: _bonus.reset( new BonusThrow(_position) ); break;
     case bonus::Type::Bomb:  _bonus.reset( new BonusBomb(_position) ); break;
   }
+}
+
+bool Tile::isBlockOfDeathIncoming() const
+{
+  return _incoming_block_of_death_shadow_animation != nullptr ||
+         _incoming_block_of_death_animation != nullptr;
+}
+
+void Tile::blockOfDeathIncoming()
+{
+  _incoming_block_of_death_shadow_animation.reset( new graphics::Animation("block_of_death_shadow", _position, Map::_tile_size, Map::_tile_size, 16, 16) );
+  _incoming_block_of_death_shadow_animation->start(200, false);
 }
 
 }
