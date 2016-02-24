@@ -17,7 +17,9 @@ BomberMan::BomberMan(const std::string& name, const std::string& logo, Position<
   _textures.emplace(Texture::Bottom, texture::TextureManager::get("player.png"));
 
   setCurrentTexture(Texture::Bottom);
-  utils::graphics::resize(_sprite, Map::_tile_size, Map::_tile_size);
+
+  // Set origin of sprite in the middle of it
+  utils::graphics::setCenterOrigin( _sprite );
 
   updatePosition(position);
 }
@@ -30,11 +32,11 @@ void BomberMan::setCurrentTexture(Texture texture)
 void BomberMan::updatePosition(const Position<float>& position)
 {
   _position = position;
-  _sprite.setPosition(_position.x - Map::_tile_size / 2, _position.y - Map::_tile_size / 2);
+  _sprite.setPosition(_position.x, _position.y);
 }
 
 void BomberMan::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
+{  
   target.draw(_sprite, states);
 }
 
@@ -58,6 +60,9 @@ BomberMan::Texture BomberMan::directionToTexture(utils::graphics::Direction dire
 
 void BomberMan::update(const sf::Time& elapsed_time)
 {
+  if(!isAlive())
+    return;
+
   // Update position
   movementUpdate(elapsed_time);
 }
@@ -130,6 +135,12 @@ std::shared_ptr<Bomb> BomberMan::dropBomb()
   _available_bombs--;
   Position<float> position = _map->getTileCenterPosition(_position);
   return std::make_shared<Bomb>( shared_from_this(), _bomb_power, position );
+}
+
+void BomberMan::setDead()
+{
+  _is_alive = false;
+  _sprite.setTexture(texture::TextureManager::get("player_dead.png"));
 }
 
 }

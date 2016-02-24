@@ -50,6 +50,7 @@ void Map::loadMap(const std::string filepath)
       // Read player position information if here
       try
       {
+        // Position is the center of the tile
         Position<float> position {x * _tile_size + Map::_tile_size / 2, y * _tile_size + Map::_tile_size / 2};
         _player_starting_positions.emplace(std::stoi(std::string{character}), position);
       }

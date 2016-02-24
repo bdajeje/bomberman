@@ -13,6 +13,9 @@ enum class Direction
 
 void resize(sf::Sprite& sprite, float x, float y);
 
+/*! Set origin of sprite in the center of it */
+void setCenterOrigin(sf::Sprite& sprite);
+
 // Speed in pixels/millisecond
 float findDistance(const sf::Time& elapsed_time, float speed);
 

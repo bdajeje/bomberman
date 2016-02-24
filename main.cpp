@@ -25,7 +25,7 @@ int main()
   font::FontManager::init("resources/fonts/");
   sound::SoundManager::init("resources/sounds/");
 
-  std::shared_ptr<sf::Time> game_remaining_time = std::make_shared<sf::Time>(sf::seconds(1)); // sf::seconds(120);
+  std::shared_ptr<sf::Time> game_remaining_time = std::make_shared<sf::Time>(sf::seconds(120));
   std::vector<std::shared_ptr<model::BomberMan>> players;
   std::shared_ptr<model::Map> map = std::make_shared<model::Map>("1", game_remaining_time);
   std::shared_ptr<model::Player> player = std::make_shared<model::Player>("1", "player_logo", map->getPlayerStartingPosition(1), map);
@@ -34,7 +34,7 @@ int main()
   std::vector<std::shared_ptr<model::IA>> ias;
   for(unsigned short i = 1; i < map->getTotalPlayers(); ++i)
   {
-    std::shared_ptr<model::IA> ia = std::make_shared<model::IA>("IA " + std::to_string(i), "player_logo", map->getPlayerStartingPosition(i+1), map);
+    std::shared_ptr<model::IA> ia = std::make_shared<model::IA>("AI " + std::to_string(i), "player_logo", map->getPlayerStartingPosition(i+1), map);
     ias.push_back( ia );
     players.push_back( ia );
   }
@@ -60,8 +60,6 @@ int main()
     sf::Event event;
     while(window.pollEvent(event))
     {
-      player->setMoving(false);
-
       // Remove compiler warnings about enumeration value not handled in switch
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wswitch"
@@ -73,6 +71,7 @@ int main()
           break;
         }
         case sf::Event::KeyPressed:
+        case sf::Event::KeyReleased:
         {
           if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
           {
@@ -94,7 +93,9 @@ int main()
             player->setDirection( utils::graphics::Direction::Right );
             player->setMoving(true);
           }
-          else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+          else player->setMoving(false);
+
+          if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
           {
             std::shared_ptr<model::Bomb> bomb = player->dropBomb();
             if(bomb)

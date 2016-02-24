@@ -39,6 +39,7 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
     void setCanKickBombs(bool can_kick_bombs) { _can_kick_bombs = can_kick_bombs; }
     void setCanThrowBombs(bool can_throw_bombs) { _can_throw_bombs = can_throw_bombs; }    
     std::shared_ptr<Bomb> dropBomb();
+    void setDead();
 
     void raiseAvailableBombs();
     void raisePower();
@@ -49,7 +50,10 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
     const std::string& getLogoName() const { return _logo_name; }
     unsigned short getAvailableBombs() const { return _available_bombs; }
     unsigned short getBombsPower() const { return _bomb_power; }
+
     bool isAlive() const { return _is_alive; }
+    bool canKickBombs() const { return _can_kick_bombs; }
+    bool canThrowBombs() const { return _can_throw_bombs; }
 
   private:
 

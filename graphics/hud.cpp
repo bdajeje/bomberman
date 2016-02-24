@@ -12,6 +12,7 @@
 namespace graphics {
 
 HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<float> position)
+  : _player {player}
 {
   // Logo
   _player_logo.setTexture( texture::TextureManager::get(player->getLogoName() + ".png") );
@@ -21,7 +22,7 @@ HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<f
   position.x += 20;
 
   const sf::Font& font = font::FontManager::get("consolas.ttf");
-  std::array<sf::Text*, 3> texts = {&_name, &_bombs_number, &_power_number};
+  std::array<sf::Text*, 4> texts = {&_name, &_bombs_number, &_power_number, &_dead_text};
   for( sf::Text* text : texts )
   {
     text->setFont(font);
@@ -35,6 +36,10 @@ HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<f
 
   position.x -= 20;
   position.y += 20;
+
+  // Dead text
+  _dead_text.setString("DEAD");
+  _dead_text.setPosition(position.x, position.y);
 
   // Bomb number skill
   _bombs.setTexture( texture::TextureManager::get("bonus_bomb.png") );
@@ -53,20 +58,40 @@ HUDPlayer::HUDPlayer(const std::shared_ptr<model::BomberMan>& player, Position<f
 
   position.x += 20;
   _power_number.setPosition(position.x, position.y);
+
+  position.x += 15;
+
+  // Bomb kick skill
+  _kick_bomb.setTexture( texture::TextureManager::get("bonus_kick.png") );
+  _kick_bomb.setPosition(position.x, position.y);
+  utils::graphics::resize(_kick_bomb, 15, 15);
+
+  position.x += 15;
+
+  // Bomb throw skill
+  _throw_bomb.setTexture( texture::TextureManager::get("bonus_throw.png") );
+  _throw_bomb.setPosition(position.x, position.y);
+  utils::graphics::resize(_throw_bomb, 15, 15);
 }
 
 void HUDPlayer::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
   target.draw(_player_logo, states);
   target.draw(_name, states);
-  target.draw(_bombs, states);
-  target.draw(_bombs_number, states);
-  target.draw(_power, states);
-  target.draw(_power_number, states);
-  if(_throw_bomb)
-    target.draw(*_throw_bomb, states);
-  if(_kick_bomb)
-    target.draw(*_kick_bomb, states);
+  if( _player->isAlive() )
+  {
+    target.draw(_bombs, states);
+    target.draw(_bombs_number, states);
+    target.draw(_power, states);
+    target.draw(_power_number, states);
+
+    if(_player->canThrowBombs())
+      target.draw(_throw_bomb, states);
+
+    if(_player->canKickBombs())
+      target.draw(_kick_bomb, states);
+  }
+  else target.draw(_dead_text);
 }
 
 HUD::HUD(const std::vector<std::shared_ptr<model::BomberMan>>& players, const std::shared_ptr<sf::Time>& game_remaining_time)

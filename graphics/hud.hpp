@@ -22,14 +22,16 @@ class HUDPlayer final : public sf::Drawable
 
   private:
 
+    std::shared_ptr<model::BomberMan> _player;
     sf::Sprite _player_logo;
     sf::Text _name;
     sf::Sprite _bombs;
     sf::Text _bombs_number;
     sf::Sprite _power;
     sf::Text _power_number;
-    std::unique_ptr<sf::Sprite> _throw_bomb;
-    std::unique_ptr<sf::Sprite> _kick_bomb;
+    sf::Sprite _throw_bomb;
+    sf::Sprite _kick_bomb;
+    sf::Text _dead_text;
 };
 
 class HUD final : public sf::Drawable
