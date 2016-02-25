@@ -122,8 +122,25 @@ int main()
       bomb->update(elapsed_time);
       if( bomb->isExploded() )
       {
-        map->bombExplose(bomb->position(), bomb->power());
+        std::vector<std::shared_ptr<model::Tile>> exploded_tiles = map->bombExplose(bomb->position(), bomb->power());
         bombs.erase(bombs.begin() + i);
+
+        // If a player stands on one of those tiles, well that player is dead
+        for( std::shared_ptr<model::BomberMan>& player : players )
+        {
+          if( player->isDead() )
+            continue;
+
+          const std::shared_ptr<model::Tile>& player_tile = map->getTile( player->getPosition() );
+          for( const std::shared_ptr<model::Tile>& exploded_tile : exploded_tiles )
+          {
+            if( exploded_tile->getPosition() == player_tile->getPosition() )
+            {
+              player->setDead();
+              break;
+            }
+          }
+        }
       }
     }
 

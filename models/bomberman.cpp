@@ -76,12 +76,12 @@ void BomberMan::movementUpdate(const sf::Time& elapsed_time)
     if( _map->isAllowedPosition(future_position, _sprite_size) )
     {
       updatePosition(future_position);
-      Tile& tile = _map->getTile(future_position);
-      const std::unique_ptr<Bonus>& bonus = tile.getBonus();
+      std::shared_ptr<Tile>& tile = _map->getTile(future_position);
+      const std::unique_ptr<Bonus>& bonus = tile->getBonus();
       if( bonus )
       {
         bonus->playerPickUp(*this);
-        tile.removeBonus();
+        tile->removeBonus();
       }
     }
   }

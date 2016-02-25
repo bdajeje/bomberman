@@ -50,8 +50,10 @@ class BomberMan : public std::enable_shared_from_this<BomberMan>,
     const std::string& getLogoName() const { return _logo_name; }
     unsigned short getAvailableBombs() const { return _available_bombs; }
     unsigned short getBombsPower() const { return _bomb_power; }
+    const Position<float>& getPosition() const { return _position; }
 
     bool isAlive() const { return _is_alive; }
+    bool isDead() const { return !_is_alive; }
     bool canKickBombs() const { return _can_kick_bombs; }
     bool canThrowBombs() const { return _can_throw_bombs; }
 

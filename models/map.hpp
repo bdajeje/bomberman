@@ -31,17 +31,23 @@ class Map final : public sf::Drawable
     unsigned short getTotalPlayers() const { return _player_starting_positions.size(); }
 
     /*! Get tile from a pixel position */
-    Tile& getTile(const Position<float>& position);
+    std::shared_ptr<Tile>& getTile(const Position<float>& position);
 
     /*! Get tile located at map position X/Y
      *  \warning no checks are done on array bounds
      */
-    Tile& getTile(size_t x, size_t y);
+    std::shared_ptr<Tile>& getTile(size_t x, size_t y);
 
     Position<float> getTileCenterPosition(const Position<float>& position);
     Position<size_t> getTilePosition(const Position<float>& position) const;
     bool isAllowedPosition(const Position<float>& position, unsigned short player_size) const;
-    void bombExplose(const Position<float>& position, unsigned short power);
+
+    /*! A bomb exploses at a given position with a given power
+     *  \param position - where the bomb is
+     *  \param power - power of the bomb
+     *  \returns exploded tiles
+     */
+    std::vector<std::shared_ptr<model::Tile>> bombExplose(const Position<float>& position, unsigned short power);
 
   private:
 
@@ -57,7 +63,7 @@ class Map final : public sf::Drawable
 
     std::string _name;
     std::shared_ptr<sf::Time> _game_remaining_time;
-    std::vector<std::vector<Tile>> _tiles;
+    std::vector<std::vector<std::shared_ptr<Tile>>> _tiles;
     std::map<int, Position<float>> _player_starting_positions;
     std::unique_ptr<utils::TimeTrigger> _block_of_death_trigger;
 };

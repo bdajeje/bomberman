@@ -52,7 +52,7 @@ void Animation::start(unsigned int sprite_time, bool loop)
 void Animation::updateSprite()
 {
   int texture_nbr = _elapsed_time / _time_between_textures;
-  int x_offset = (texture_nbr * _texture_width) + (1 * texture_nbr);
+  uint x_offset = (texture_nbr * _texture_width) + (1 * texture_nbr);
 
   if(x_offset >= _sprite.getTexture()->getSize().x)
   {
