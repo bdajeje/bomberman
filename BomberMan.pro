@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     graphics/effects/blink_effect.cpp \
     graphics/drawable.cpp \
     utils/time_trigger.cpp \
-    models/game.cpp
+    models/game.cpp \
+    graphics/main_menu.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -67,4 +68,5 @@ HEADERS += \
     graphics/effects/blink_effect.hpp \
     graphics/drawable.hpp \
     utils/time_trigger.hpp \
-    models/game.hpp
+    models/game.hpp \
+    graphics/main_menu.hpp

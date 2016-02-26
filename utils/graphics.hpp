@@ -19,6 +19,15 @@ void setCenterOrigin(sf::Sprite& sprite);
 // Speed in pixels/millisecond
 float findDistance(const sf::Time& elapsed_time, float speed);
 
+/*! Horizontally center a text */
+void honrizontalCenter(sf::Text& text, uint total_width);
+
+/*! Vertically center texts */
+void verticalCenter(const std::vector<sf::Text*>& texts, uint total_height, uint y_offset = 0);
+
+/*! Position a spriteat the bottom right corner */
+void positionBottomRight(sf::Sprite& sprite, uint width, uint height);
+
 }
 }
 
