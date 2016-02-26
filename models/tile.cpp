@@ -10,6 +10,7 @@
 #include "models/bonusspeed.hpp"
 #include "models/bonusthrow.hpp"
 #include "models/bonusbomb.hpp"
+#include "models/game.hpp"
 
 namespace model {
 
@@ -53,6 +54,14 @@ void Tile::update(const sf::Time& elapsed_time)
     if(_incoming_block_of_death_shadow_animation->finished())
     {
       _incoming_block_of_death_shadow_animation.release();
+
+      // If a player is standing here, well, is now dead
+      const std::shared_ptr<Map> map = Game::instance()->_map;
+      for(std::shared_ptr<BomberMan>& player : Game::instance()->_players)
+      {
+        if( map->getTile( player->getPosition() )->getPosition() == _position )
+          player->setDead();
+      }
 
       // \todo then start incoming block animation, but I guess this should be an effect runned an a sprite to make the move from air to ground
       // for now simply put a unbreackable block instead

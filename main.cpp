@@ -5,11 +5,11 @@
 #include <SFML/Audio/Sound.hpp>
 
 #include "defines.hpp"
-#include "utils/timer.hpp"
 #include "utils/graphics.hpp"
 #include "managers/texturemanager.hpp"
 #include "managers/fontmanager.hpp"
 #include "managers/soundmanager.hpp"
+#include "models/game.hpp"
 #include "models/map.hpp"
 #include "models/player.hpp"
 #include "models/ia.hpp"
@@ -18,8 +18,20 @@
 
 int main()
 {
+  // Creat window
   sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Bomber Man");
-  window.setFramerateLimit(60);
+  window.setFramerateLimit(60);  
+
+  // Set window icon (not working I don't know why...)
+  {
+    sf::Image icon;
+    if(!icon.loadFromFile("resources/icon.png"))
+    {
+      std::cerr << "Error while loading application icon" << std::endl;
+      return EXIT_FAILURE;
+    }
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+  }
 
   texture::TextureManager::init("resources/textures/");
   font::FontManager::init("resources/fonts/");
@@ -47,13 +59,12 @@ int main()
   game_view.move(0, -HUD_HEIGHT);
   sf::View hud_view{ {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT} };
 
-  sf::Time last_update {sf::Time::Zero};
-  utils::time::Timer timer;
+  sf::Time last_update {sf::Time::Zero};  
 
   // Start game
+  std::unique_ptr<model::Game>& game = model::Game::reset(map, players);
   sf::Sound sound {sound::SoundManager::get("game_start.wav")};
-  sound.play();
-  timer.start();  
+  sound.play();  
 
   while(window.isOpen())
   {
@@ -107,7 +118,7 @@ int main()
     }
 
     // Get elapsed time since last update
-    const sf::Time elapsed_time = timer.getElapsedTime() - last_update;
+    const sf::Time elapsed_time = game->_timer.getElapsedTime() - last_update;
     *game_remaining_time -= elapsed_time;
 
     // Update elements
@@ -145,7 +156,7 @@ int main()
     }
 
     // Save last update time
-    last_update = timer.getElapsedTime();
+    last_update = game->_timer.getElapsedTime();
 
     // Draw everything
     window.clear();
@@ -160,5 +171,5 @@ int main()
     window.display();
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

@@ -102,7 +102,7 @@ void Map::createBlockOfDeath(const sf::Time& elapsed_time)
     return;
 
   // Mark random spot as block of death incoming
-  int random_index = rand() % (free_positions.size() - 1);
+  int random_index = free_positions.size() == 1 ? 0 : rand() % (free_positions.size() - 1);
   std::shared_ptr<Tile>& tile = getTile( free_positions[random_index].x, free_positions[random_index].y );
   tile->blockOfDeathIncoming();
 }
