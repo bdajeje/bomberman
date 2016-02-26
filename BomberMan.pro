@@ -31,7 +31,8 @@ SOURCES += main.cpp \
     utils/time_trigger.cpp \
     models/game.cpp \
     graphics/main_menu.cpp \
-    utils/key_limitor.cpp
+    utils/key_limitor.cpp \
+    graphics/intro_screen.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -71,4 +72,5 @@ HEADERS += \
     utils/time_trigger.hpp \
     models/game.hpp \
     graphics/main_menu.hpp \
-    utils/key_limitor.hpp
+    utils/key_limitor.hpp \
+    graphics/intro_screen.hpp

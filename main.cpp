@@ -10,6 +10,7 @@
 #include "managers/soundmanager.hpp"
 #include "models/game.hpp"
 #include "graphics/main_menu.hpp"
+#include "graphics/intro_screen.hpp"
 
 int main()
 {
@@ -33,6 +34,14 @@ int main()
   sound::SoundManager::init("resources/sounds/");
 
   srand(time(NULL));
+
+  // Run intro screens
+  graphics::IntroScreen bomberman_intro_screen {window, "bomberman_intro_screen", 1000};
+  bomberman_intro_screen.run();
+  graphics::IntroScreen sfml_intro_screen {window, "sfml_intro_screen", 1000};
+  sfml_intro_screen.run();
+  graphics::IntroScreen dev_intro_screen {window, "developer_intro_screen", 1000};
+  dev_intro_screen.run();
 
   // Create menu
   bool quit = false;
