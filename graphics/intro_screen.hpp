@@ -15,6 +15,10 @@ class IntroScreen
 
   private:
 
+    void update(const sf::Time& elapsed_time);
+
+  private:
+
     sf::RenderWindow& _window;
     const uint _display_time;
     sf::Sprite _background;

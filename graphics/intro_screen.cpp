@@ -1,7 +1,10 @@
 #include "intro_screen.hpp"
 
+#include <iostream>
+
 #include "managers/texturemanager.hpp"
 #include "utils/graphics.hpp"
+#include "utils/timer.hpp"
 
 namespace graphics {
 
@@ -15,8 +18,15 @@ IntroScreen::IntroScreen(sf::RenderWindow& window, const std::string& texture_fi
 
 void IntroScreen::run()
 {
+  utils::time::Timer timer;
+  timer.start();
+
   while(_window.isOpen())
   {
+    // Quit when no more time
+    if( timer.getElapsedTime().asMilliseconds() >= _display_time )
+      return;
+
     sf::Event event;
     while(_window.pollEvent(event))
     {
@@ -31,15 +41,38 @@ void IntroScreen::run()
         }
         case sf::Event::KeyPressed:
         {
-          return;
+          if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            return;
         }
       }
       #pragma GCC diagnostic pop
     }
 
+    update( timer.getElapsedTime() );
+
     _window.clear();
     _window.draw( _background );
     _window.display();
+  }
+}
+
+void IntroScreen::update(const sf::Time& elapsed_time)
+{
+  // Cut total time in three equal sections
+  const int effect_time = _display_time / 3;
+
+  if( elapsed_time.asMilliseconds() <= effect_time ||
+      elapsed_time.asMilliseconds() > effect_time * 2 )
+  {
+    const float effect_ratio = static_cast<float>(elapsed_time.asMilliseconds()) / effect_time;
+    sf::Uint8 transparency = effect_ratio * 255;
+
+    // When fade in
+    if( elapsed_time.asMilliseconds() <= effect_time )
+      _background.setColor( sf::Color{255, 255, 255, transparency} );
+    // When fade out
+    else if( elapsed_time.asMilliseconds() > effect_time * 2 )
+      _background.setColor( sf::Color{255, 255, 255, 255 - transparency} );
   }
 }
 
