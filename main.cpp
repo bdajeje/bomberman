@@ -35,17 +35,20 @@ int main()
   srand(time(NULL));
 
   // Create menu
+  bool quit = false;
   graphics::MainMenu main_menu {window};
-  switch( main_menu.run() )
+  while( !quit )
   {
-    case graphics::MainMenu::Action::NewGame:
+    graphics::MainMenu::Action next_action = main_menu.run();
+
+    if(next_action == graphics::MainMenu::Action::NewGame)
     {
       // Start game
       std::unique_ptr<model::Game>& game = model::Game::reset(window, "1");
       game->start();
-      break;
     }
-    case graphics::MainMenu::Action::Quit: break;
+    else if(next_action == graphics::MainMenu::Action::Quit)
+      quit = true;
   }
 
   return EXIT_SUCCESS;

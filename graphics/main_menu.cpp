@@ -2,14 +2,18 @@
 
 #include <iostream>
 
+#include <SFML/Audio/Sound.hpp>
+
 #include "managers/fontmanager.hpp"
 #include "managers/texturemanager.hpp"
+#include "managers/soundmanager.hpp"
 #include "utils/graphics.hpp"
 
 namespace graphics {
 
 MainMenu::MainMenu(sf::RenderWindow& window)
   : _window {window}
+  , _key_limitor { 250 }
 {
   const sf::Font& font = font::FontManager::get("consolas.ttf");
 
@@ -39,14 +43,16 @@ MainMenu::MainMenu(sf::RenderWindow& window)
   _menu_items.push_back( &_options_text );
   _menu_items.push_back( &_quit_text );
 
-  setSelectedMenuItem( 0 );
+  setSelectedMenuItem( 0, false );
 }
 
 MainMenu::Action MainMenu::run()
 {
   while(_window.isOpen())
   {
-    handleEvents();
+    Action action = handleEvents();
+    if( action != Action::None )
+      return action;
 
     draw();
   }
@@ -54,7 +60,7 @@ MainMenu::Action MainMenu::run()
   return Action::Quit;
 }
 
-void MainMenu::handleEvents()
+MainMenu::Action MainMenu::handleEvents()
 {
   sf::Event event;
   while(_window.pollEvent(event))
@@ -71,16 +77,20 @@ void MainMenu::handleEvents()
       }
       case sf::Event::KeyPressed:
       {
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-          setSelectedMenuItem(--_selected_menu_item);
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-          setSelectedMenuItem(++_selected_menu_item);
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && _key_limitor.isAllow(sf::Keyboard::Up))
+          setSelectedMenuItem(--_selected_menu_item, true);
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && _key_limitor.isAllow(sf::Keyboard::Down))
+          setSelectedMenuItem(++_selected_menu_item, true);
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+          return selectCurrentMenuItem();
 
         break;
       }
     }
     #pragma GCC diagnostic pop
   }
+
+  return Action::None;
 }
 
 void MainMenu::draw()
@@ -96,7 +106,7 @@ void MainMenu::draw()
   _window.display();
 }
 
-void MainMenu::setSelectedMenuItem( int offset )
+void MainMenu::setSelectedMenuItem( int offset, bool play_sound )
 {
   if(offset >= static_cast<int>(_menu_items.size()))
     offset = 0;
@@ -109,7 +119,7 @@ void MainMenu::setSelectedMenuItem( int offset )
   {
     sf::Text* menu_item = _menu_items[i];
 
-    if( i == _selected_menu_item )
+    if( static_cast<int>(i) == _selected_menu_item )
     {
       menu_item->setColor( _selected_menu_item_color );
       _bomb_icon.setPosition( menu_item->getPosition().x - _bomb_icon.getGlobalBounds().width - 15, menu_item->getPosition().y + ( menu_item->getGlobalBounds().height - _bomb_icon.getGlobalBounds().height) );
@@ -117,6 +127,24 @@ void MainMenu::setSelectedMenuItem( int offset )
     else
       menu_item->setColor( _menu_item_color );
   }
+
+  if(play_sound)
+  {
+    static sf::Sound sound {sound::SoundManager::get("change_menu_item.wav")};
+    sound.play();
+  }
+}
+
+MainMenu::Action MainMenu::selectCurrentMenuItem()
+{
+  switch( _selected_menu_item )
+  {
+    case 0: return Action::NewGame;
+    case 1: return Action::Options;
+    case 2: return Action::Quit;
+  }
+
+  return Action::None;
 }
 
 }

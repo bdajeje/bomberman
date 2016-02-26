@@ -3,13 +3,15 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "utils/key_limitor.hpp"
+
 namespace graphics {
 
 class MainMenu
 {
   public:
 
-    enum class Action { Quit, NewGame };
+    enum class Action { NewGame, Options, Quit, None };
 
     MainMenu(sf::RenderWindow& window);
 
@@ -17,15 +19,17 @@ class MainMenu
 
   private:
 
-    void handleEvents();
+    Action handleEvents();
     void draw();
-    void setSelectedMenuItem(int offset);
+    void setSelectedMenuItem(int offset, bool play_sound);
+    Action selectCurrentMenuItem();
 
   private:
 
+    sf::RenderWindow& _window;
+    utils::KeyLimitor _key_limitor;
     bool _is_quitting {false};
     int _selected_menu_item {0};
-    sf::RenderWindow& _window;
     sf::Text _play_text;
     sf::Text _options_text;
     sf::Text _quit_text;
