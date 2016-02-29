@@ -37,13 +37,12 @@ int main()
 
   // Run intro screens
   {
-    const uint intro_screen_display_time = 3000;
-    graphics::IntroScreen bomberman_intro_screen {window, "bomberman_intro_screen", intro_screen_display_time};
-    bomberman_intro_screen.run();
-    graphics::IntroScreen sfml_intro_screen {window, "sfml_intro_screen", intro_screen_display_time};
-    sfml_intro_screen.run();
-    graphics::IntroScreen dev_intro_screen {window, "developer_intro_screen", intro_screen_display_time};
-    dev_intro_screen.run();
+    std::array<std::string, 3> intros = {"bomberman_intro_screen", "sfml_intro_screen", "developer_intro_screen"};
+    for( const std::string& intro : intros )
+    {
+      graphics::IntroScreen bomberman_intro_screen {window, intro, 3000};
+      bomberman_intro_screen.run();
+    }
   }
 
   // Create menu
