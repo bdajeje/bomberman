@@ -32,7 +32,8 @@ SOURCES += main.cpp \
     models/game.cpp \
     graphics/main_menu.cpp \
     utils/key_limitor.cpp \
-    graphics/intro_screen.cpp
+    graphics/intro_screen.cpp \
+    graphics/options_menu.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -73,4 +74,5 @@ HEADERS += \
     models/game.hpp \
     graphics/main_menu.hpp \
     utils/key_limitor.hpp \
-    graphics/intro_screen.hpp
+    graphics/intro_screen.hpp \
+    graphics/options_menu.hpp

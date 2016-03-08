@@ -181,7 +181,7 @@ void Game::draw() const
   _window.setView(_hud_view);
   _window.draw(*_hud);
 
-
+  _window.display();
 }
 
 }

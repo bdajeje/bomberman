@@ -5,7 +5,7 @@
 
 namespace graphics {
 
-class IntroScreen
+class IntroScreen final
 {
   public:
 
